@@ -69,6 +69,12 @@ fn create_window(app: &tauri::AppHandle, label: &str, state: WindowState) {
 static WINDOW_COUNTER: AtomicU32 = AtomicU32::new(1);
 
 fn main() {
+    // WebKitGTK + NVIDIA on Wayland freezes while typing (DMABUF renderer bug).
+    // Only set when the user hasn't overridden it. See tauri-apps/tauri#9394.
+    if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .setup(|app| {
